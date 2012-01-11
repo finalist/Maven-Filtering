@@ -1,0 +1,5 @@
+A "fork" of the Maven Filtering project.
+See: http://svn.apache.org/viewvc/maven/shared/tags/maven-filtering-1.0
+
+Changes:
+1) It is now possible to use property replacement in filenames. For example ${pom.version}.txt wil, depending on the versionnumber, 1.0.txt

@@ -22,6 +22,8 @@ package org.apache.maven.shared.filtering;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -43,6 +45,8 @@ import org.codehaus.plexus.interpolation.ValueSource;
 import org.codehaus.plexus.interpolation.multi.MultiDelimiterStringSearchInterpolator;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.FileUtils.FilterWrapper;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
@@ -112,7 +116,8 @@ public class DefaultMavenFileFilter
                 }
                 FileUtils.FilterWrapper[] wrappers = (FileUtils.FilterWrapper[]) filterWrappers
                     .toArray( new FileUtils.FilterWrapper[filterWrappers.size()] );
-                FileUtils.copyFile( from, to, encoding, wrappers );
+                File filterTo = filterFileName(to, wrappers);
+                FileUtils.copyFile( from, filterTo, encoding, wrappers );
             }
             else
             {
@@ -292,6 +297,35 @@ public class DefaultMavenFileFilter
         }
     }
     
+    /*
+     * Filter the name of a file using the same mechanism for filtering the content of the file.
+     */
+    private File filterFileName(File file, FilterWrapper[] wrappers) throws IOException {
+    	
+        if ( wrappers != null && wrappers.length > 0 ) {
+        	
+            Reader reader = new StringReader(file.getName());
+            for ( int i = 0; i < wrappers.length; i++ ) {
+                FilterWrapper wrapper = wrappers[i];
+                reader = wrapper.getReader( reader );
+            }
+            StringWriter writer = new StringWriter();
+            
+            IOUtil.copy(reader, writer);
+            
+            String filteredFilename = writer.toString();
+            
+            if (getLogger().isDebugEnabled()) {
+            	getLogger().debug( "renaming filename " + file.getName() + " to " + filteredFilename );
+            }
+                        
+            return new File(file.getParentFile(),filteredFilename);
+        }
+        else {
+        	return file;
+        }
+    }
+    
     private static final class Wrapper extends FileUtils.FilterWrapper
     {
         
@@ -390,6 +424,5 @@ public class DefaultMavenFileFilter
             return filterReader;
         }
         
-    }
-
+    }    
 }

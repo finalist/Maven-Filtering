@@ -717,5 +717,36 @@ public class DefaultMavenResourcesFilteringTest
 
         assertTrue( nonFilteredResult.equals( expectedNonFilteredResult ) );
     }
+    
+    public void testFilterFileName() throws Exception {
 
+	    File baseDir = new File( "c:\\foo\\bar" );
+	    StubMavenProject mavenProject = new StubMavenProject( baseDir );
+	    mavenProject.setVersion( "1.0" );
+	    mavenProject.setGroupId( "org.apache" );
+	    mavenProject.setName( "test project" );
+	
+	    MavenResourcesFiltering mavenResourcesFiltering = (MavenResourcesFiltering) lookup( MavenResourcesFiltering.class.getName() );
+	
+	    String unitFilesDir = getBasedir() + "/src/test/units-files/maven-filename-filtering";
+	
+	    Resource resource = new Resource();
+	    List resources = new ArrayList();
+	    resources.add( resource );
+	    resource.setDirectory( unitFilesDir );
+	    resource.setFiltering( true );
+	    resource.addInclude( "${pom.version}*" );
+	    resource.setTargetPath( "testTargetPath" );
+	
+	    MavenResourcesExecution mavenResourcesExecution = new MavenResourcesExecution( resources, outputDirectory, mavenProject,
+	                                                                                   "UTF-8", Collections.EMPTY_LIST, Collections.EMPTY_LIST,
+	                                                                                   new StubMavenSession() );
+	    mavenResourcesFiltering.filterResources( mavenResourcesExecution );
+	
+	    File targetPathFile = new File( outputDirectory, "testTargetPath" );
+	
+	    File[] files = targetPathFile.listFiles();
+	    assertEquals( 1, files.length );
+	    assertEquals( "1.0.txt", files[0].getName() );
+    }
 }

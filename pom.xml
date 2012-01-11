@@ -40,9 +40,9 @@
   </prerequisites>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/shared/tags/maven-filtering-1.0</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/shared/tags/maven-filtering-1.0</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/shared/tags/maven-filtering-1.0</url>
+    <connection>scm:git:https://github.com/finalist/Maven-Filtering.git</connection>
+    <developerConnection>scm:git:https://github.com/finalist/Maven-Filtering.git</developerConnection>
+    <url>https://github.com/finalist/Maven-Filtering</url>
   </scm>
   <issueManagement>
     <system>jira</system>
